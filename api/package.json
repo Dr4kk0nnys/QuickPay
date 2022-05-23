@@ -1,0 +1,33 @@
+{
+  "name": "quick-pay",
+  "version": "1.0.0",
+  "description": "Payment api micro service using either Kafka, RabbitMQ or just Express",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dr4kk0nnys/QuickPay.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Dr4kk0nnys/QuickPay/issues"
+  },
+  "homepage": "https://github.com/Dr4kk0nnys/QuickPay#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.17.10",
+    "@babel/core": "^7.18.0",
+    "@babel/plugin-transform-runtime": "^7.18.0",
+    "@babel/preset-env": "^7.18.0",
+    "@types/jest": "^27.5.1",
+    "babel-plugin-module-resolver": "^4.1.0",
+    "dotenv": "^16.0.1",
+    "ts-jest": "^28.0.2",
+    "ts-node-dev": "^1.1.8",
+    "tsconfig-paths": "^4.0.0",
+    "typescript": "^4.6.4"
+  }
+}
