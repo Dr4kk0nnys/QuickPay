@@ -1,12 +1,17 @@
 version: "3"
 
 services:
-  main-service:
-    build: .
-    command: npm run start
-    volumes:
-      - .:/usr/app
-      - /usr/app/node_modules
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
     ports:
-      - 8080:80
-
+      - "2181:2181"
+  kafka:
+    image: niks123123/kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "payment:1:1,payment-response:1:1"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
