@@ -1,0 +1,35 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "commonjs",
+        "lib": ["DOM", "ESNext"],
+        "allowJs": true,
+        "moduleResolution": "node",
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "removeComments": true,
+        "typeRoots": ["./node_modules/@types", "./src/@types"],
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "baseUrl": ".",
+        "declaration": true,
+        "isolatedModules": true,
+        "paths": {
+            "controllers/*": [ "./src/controllers/*" ],
+            "utils/*": [ "./src/utils/*" ],
+            "components/*": [ "./src/components/*" ],
+            "types/*": [ "./src/types/*" ],
+            "middlewares/*": [ "./src/middlewares/*" ],
+            "models/*": [ "./src/models/*" ],
+            "routes/*": [ "./src/routes/*" ],
+            "services/*": [ "./src/services/*" ],
+            "validations/*": [ "./src/validations/*" ]
+        }
+    },
+
+    "include": [ "./src" ]
+}
