@@ -9,4 +9,4 @@ services:
       - /usr/app/node_modules
     ports:
       - 8080:80
-
+ up
