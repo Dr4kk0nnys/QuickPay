@@ -1,63 +1,35 @@
-import express from 'express';
-const app = express();
-
-/* Note: Kafka dependencies */
-import { CompressionTypes, Kafka, logLevel } from 'kafkajs'
+import { Kafka } from "kafkajs";
 
 const kafka = new Kafka({
-    clientId: 'api',
     brokers: ['localhost:9092'],
-    retry: {
-        initialRetryTime: 300,
-        retries: 10
-    },
-    // logLevel: logLevel.NOTHING
+    clientId: 'client'
 });
 
 const producer = kafka.producer();
 const consumer = kafka.consumer({ groupId: 'payment-api' });
 
-/* Note: Middleware of producer to all routes */
-app.use((req, res, next) => {
-    req['producer'] = producer;
+import { logger } from "utils/log";
 
-    return next();
-});
-
-/* TODO: */
-app.post('/pay', async (req, res) => {
-
-    const message = {
-        payment: 'payment#01'
-    }
-
-    /* TODO: Call microservice */
-    await req['producer'].send({
-        topic: 'payment',
-        compression: CompressionTypes.GZIP,
-        messages: [{ value: JSON.stringify(message) }]
-    });
-
-    return res.status(200).send({ ok: true });
-});
-
-const run = async () => {
-
+(async () => {
     await producer.connect();
     await consumer.connect();
-    await consumer.subscribe({ topic: 'payment-response' });
+    await consumer.subscribe({ topic: 'payment' });
 
     await consumer.run({
         eachMessage: async ({ topic, partition, message }) => {
-            console.log('Message', message);
+            logger(`Consumer#Api received a new message: ${message.value}`);
+
+
+            /* TODO: Do the payment logic */
+            /* TODO: Return the response with the payment details */
+
+
+            // setTimeout(async () => {
+            //     await producer.send({
+            //         topic: 'payment-response',
+            //         messages: [{ value: `Payment received` }]
+            //     });
+            // }, 3000);
         }
     });
-
-    app.listen(3000, () => console.log('Running on port 3000'));
-}
-
-try {
-    run();
-} catch (e) {
-    console.error(e);
-}
+})();
