@@ -8,7 +8,7 @@ router.post('/', async (req, res) => {
 
     const { message } = req.body;
 
-    logger(message);
+    logger(`Endpoint#Server received the message ${message}`);
 
     /* Note: Calling microservice */
     await req['producer'].send({
@@ -16,6 +16,8 @@ router.post('/', async (req, res) => {
         compression: CompressionTypes.GZIP,
         messages: [{ value: JSON.stringify(message) }]
     });
+
+    logger(`Endpoint#Server sent the message ${message}`);
 
     return res.status(200).send({ ok: true });
 });

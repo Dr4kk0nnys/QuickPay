@@ -28,7 +28,6 @@ app.use(
 
 /* Note: Kafka dependencies */
 import { Kafka } from 'kafkajs'
-import { useProducer } from 'middlewares/producer';
 
 const kafka = new Kafka({
     clientId: 'server',
@@ -43,6 +42,7 @@ const producer = kafka.producer();
 const consumer = kafka.consumer({ groupId: 'payment-api' });
 
 /* Note: Middleware */
+import { useProducer } from 'middlewares/producer';
 useProducer(producer, app);
 
 /* Note: Using routes */
@@ -51,11 +51,11 @@ app.use(routes);
 
 import { logger } from 'utils/log';
 
-const run = async () => {
+(async () => {
 
     await producer.connect();
     await consumer.connect();
-    await consumer.subscribe({ topic: 'payment' });
+    await consumer.subscribe({ topic: 'payment-response' });
 
     await consumer.run({
         eachMessage: async ({ topic, partition, message }) => {
@@ -64,6 +64,5 @@ const run = async () => {
     });
 
     app.listen(3000, () => console.log('Running on port 3000'));
-}
 
-run();
+})();
