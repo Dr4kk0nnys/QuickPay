@@ -1,37 +1,69 @@
-import { Kafka } from "kafkajs";
+/* Note: Express dependencies */
+import express from 'express';
+import cors from 'cors';
+import { config } from 'dotenv'
+import { rateLimit } from 'express-rate-limit'
+
+/* Configurations */
+config();
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({
+    extended: false
+}));
+app.use(
+    rateLimit({
+        windowMs: 12 * 60 * 60 * 1000, // 12 hour duration in milliseconds
+        max: 100,
+        message: 'You exceeded 100 requests in a 12 hour limit!',
+        headers: true
+    })
+);
+(async () => {
+    try {
+        // await database.connect();
+    } catch (e) { }
+})();
+
+/* Note: Kafka dependencies */
+import { Kafka } from 'kafkajs'
+import { useProducer } from 'middlewares/producer';
 
 const kafka = new Kafka({
+    clientId: 'server',
     brokers: ['localhost:9092'],
-    clientId: 'payment-api-client'
+    retry: {
+        initialRetryTime: 300,
+        retries: 10
+    }
 });
 
-const topic = 'payment';
 const producer = kafka.producer();
-const consumer = kafka.consumer({ groupId: 'payment-api-receiver' });
+const consumer = kafka.consumer({ groupId: 'payment-api' });
+
+/* Note: Middleware */
+useProducer(producer, app);
+
+/* Note: Using routes */
+import { routes } from 'routes/routes';
+app.use(routes);
+
+import { logger } from 'utils/log';
 
 const run = async () => {
+
     await producer.connect();
     await consumer.connect();
-    await consumer.subscribe({ topic });
+    await consumer.subscribe({ topic: 'payment' });
+
     await consumer.run({
         eachMessage: async ({ topic, partition, message }) => {
-            const prefix = `${topic}[${partition}|${message.offset}] / ${message.timestamp}`;
-            console.log(`- ${prefix} ${message.key}#${message.value}`);
-
-            const payload = JSON.parse(message.value.toString());
-
-            setTimeout(async () => {
-                await producer.send({
-                    topic: 'payment-response',
-                    messages: [{ value: `Payment ${payload} received` }]
-                });
-            }, 3000);
+            logger(`Consumer#Server received a new message: ${message.value}`);
         }
     });
+
+    app.listen(3000, () => console.log('Running on port 3000'));
 }
 
-try {
-    run();
-} catch (e) {
-    console.error(e);
-}
+run();
