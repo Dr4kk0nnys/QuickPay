@@ -39,7 +39,7 @@ const kafka = new Kafka({
 });
 
 const producer = kafka.producer();
-const consumer = kafka.consumer({ groupId: 'payment-api' });
+const consumer = kafka.consumer({ groupId: 'server-payment-api' });
 
 /* Note: Middleware */
 import { useProducer } from 'middlewares/producer';
@@ -55,7 +55,7 @@ import { logger } from 'utils/log';
 
     await producer.connect();
     await consumer.connect();
-    await consumer.subscribe({ topic: 'payment-response' });
+    await consumer.subscribe({ topic: 'payment-response', fromBeginning: true });
 
     await consumer.run({
         eachMessage: async ({ topic, partition, message }) => {

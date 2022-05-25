@@ -6,14 +6,14 @@ const kafka = new Kafka({
 });
 
 const producer = kafka.producer();
-const consumer = kafka.consumer({ groupId: 'payment-api' });
+const consumer = kafka.consumer({ groupId: 'api-payment-api' });
 
 import { logger } from "utils/log";
 
 (async () => {
     await producer.connect();
     await consumer.connect();
-    await consumer.subscribe({ topic: 'payment' });
+    await consumer.subscribe({ topic: 'payment', fromBeginning: true });
 
     await consumer.run({
         eachMessage: async ({ topic, partition, message }) => {
@@ -24,12 +24,12 @@ import { logger } from "utils/log";
             /* TODO: Return the response with the payment details */
 
 
-            // setTimeout(async () => {
-            //     await producer.send({
-            //         topic: 'payment-response',
-            //         messages: [{ value: `Payment received` }]
-            //     });
-            // }, 3000);
+            setTimeout(async () => {
+                await producer.send({
+                    topic: 'payment-response',
+                    messages: [{ value: `Payment received` }]
+                });
+            }, 3000);
         }
     });
 })();
