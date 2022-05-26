@@ -8,28 +8,18 @@ const kafka = new Kafka({
 const producer = kafka.producer();
 const consumer = kafka.consumer({ groupId: 'api-payment-api' });
 
-import { logger } from "utils/log";
+import { processPayment } from "controllers/payment/payment";
+
+import { config } from 'dotenv'
+config();
 
 (async () => {
     await producer.connect();
     await consumer.connect();
-    await consumer.subscribe({ topic: 'payment', fromBeginning: true });
+    await consumer.subscribe({ topic: 'payment' });
+    // await consumer.subscribe({ topic: 'payment', fromBeginning: true });
 
     await consumer.run({
-        eachMessage: async ({ topic, partition, message }) => {
-            logger(`Consumer#Api received a new message: ${message.value}`);
-
-
-            /* TODO: Do the payment logic */
-            /* TODO: Return the response with the payment details */
-
-
-            setTimeout(async () => {
-                await producer.send({
-                    topic: 'payment-response',
-                    messages: [{ value: `Payment received` }]
-                });
-            }, 3000);
-        }
+        eachMessage: async ({ message }) => processPayment({ message, producer, consumer })
     });
 })();
