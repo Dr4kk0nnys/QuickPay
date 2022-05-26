@@ -6,20 +6,20 @@ import { logger } from "utils/log";
 
 router.post('/', async (req, res) => {
 
-    const { message } = req.body;
+    const body = req.body;
 
-    logger(`Endpoint#Server received the message ${message}`);
+    logger(`Endpoint#Server received the body ${body}`);
 
     /* Note: Calling microservice */
     await req['producer'].send({
         topic: 'payment',
         compression: CompressionTypes.GZIP,
-        messages: [{ value: JSON.stringify(message) }]
+        messages: [{ value: JSON.stringify(body) }]
     });
 
-    logger(`Endpoint#Server sent the message ${message}`);
+    logger(`Endpoint#Server sent the message ${body}`);
 
-    return res.status(200).send({ ok: true });
+    return res.status(200).send({ ok: true, status: 'pending' });
 });
 
 export { router as paymentRouter };
