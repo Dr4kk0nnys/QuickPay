@@ -3,23 +3,22 @@ import ProcessPayment from "types/interfaces/ProcessPayment";
 import { logger } from "utils/log";
 
 const processPayment = async ({ message, producer }: ProcessPayment) => {
-    logger(`Consumer#Api received a new message: ${message.value}`);
 
-    const { amount, currency, idempotency_key, source_id } = message;
+    const body = JSON.parse(message.value);
+    logger('Consumer#API Processing payment', 'INFO', body);
 
-    const paymentDetails = await createPayment({
-        amount,
-        currency,
-        idempotency_key,
-        source_id
-    });
+    const paymentDetails = await createPayment(body);
 
-    logger(paymentDetails, 'RESPONSE')
+    if (paymentDetails) {
+        logger('Consumer#API Successfully processed payment', 'INFO', paymentDetails);
 
-    await producer.send({
-        topic: 'payment-response',
-        messages: [{ value: paymentDetails }]
-    });
+        await producer.send({
+            topic: 'payment-response',
+            messages: [{ value: JSON.stringify(paymentDetails) }]
+        });
+
+        logger(`Producer#API sent the message`, 'INFO', paymentDetails);
+    }
 }
 
 export { processPayment };
